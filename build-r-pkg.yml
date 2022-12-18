@@ -1,0 +1,56 @@
+
+on:
+  push:
+    branches: [main, master, staging]
+    paths:
+     - 'R/*.R'
+     - 'DESCRIPTION'
+     - 'NAMESPACE'
+     - 'build-r-pkg.R'
+name: build-r-packages
+
+jobs:
+
+  setup-r-environment:
+    name: Setup R Environment
+    runs-on: ubuntu-latest
+    container: rocker/verse:4.2.2
+    
+    steps:
+
+      - name: Install Required Ubuntu Packages
+        # Not all of these packages are needed
+        run: |
+          apt-get update -qq && apt-get -y --no-install-recommends install \
+          wget \
+          libcurl4-openssl-dev \
+          gdebi-core \
+          libbz2-dev \
+          xzdec \
+          tree
+
+      - name: Repo Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v2
+
+      - name: Setup R Dependencies
+        uses: r-lib/actions/setup-r-dependencies@v2
+        # https://github.com/r-lib/actions/tree/v2/setup-r-dependencies#usage
+        with:
+          cache-version: 2
+        
+      - name: Run R Script to Build Packages
+        run: Rscript build-r-pkg.R
+
+      - name: Commit & Push
+        run: |
+          git config --global --add safe.directory $GITHUB_WORKSPACE
+          git config --global core.autocrlf false
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          git config --global user.name "${{ github.actor }}"
+          git add . && git add --renormalize .
+          git commit --allow-empty -am "GITHUB ACTION: ${{ github.workflow }}"
+          NO_PAGER=1 git --no-pager diff HEAD^
+          git push origin || echo "No changes to commit"
