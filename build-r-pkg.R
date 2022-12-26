@@ -18,13 +18,13 @@ r_version <- paste(unlist(getRversion())[1:2], collapse = ".")
 
 bin_paths <- list(
   # Windows
-  win_binary = file.path("bin/windows/contrib", r_version),
+  win_binary = file.path("bin", "windows", "contrib", r_version),
   # macOS (X86)
-  mac_binary = file.path("bin/macosx/contrib", r_version),
+  mac_binary = file.path("bin", "macosx", "contrib", r_version),
   # macOS (ARM)
   # See: https://cran.r-project.org/bin/macosx/
-  mac_binary_big_sur = file.path("bin/macosx/big-sur-arm64/contrib", r_version),
-  mac_binary_el_capitan = file.path("bin/macosx/el-capitan/contrib", r_version)
+  mac_binary_big_sur = file.path("bin", "macosx", "big-sur-arm64", "contrib", r_version),
+  mac_binary_el_capitan = file.path("bin", "macosx", "el-capitan", "contrib", r_version)
 )
 
 bin_paths <- lapply(bin_paths, function(x) file.path(tiny_cran, x))
